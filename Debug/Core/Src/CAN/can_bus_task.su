@@ -1,0 +1,5 @@
+../Core/Src/CAN/can_bus_task.c:22:6:can_init	40	static
+../Core/Src/CAN/can_bus_task.c:62:6:can_tx_update	64	static
+../Core/Src/CAN/can_bus_task.c:88:6:can_tx_task	16	static
+../Core/Src/CAN/can_bus_task.c:98:6:can_rx_update	64	static
+../Core/Src/CAN/can_bus_task.c:121:6:can_rx_task	16	static
