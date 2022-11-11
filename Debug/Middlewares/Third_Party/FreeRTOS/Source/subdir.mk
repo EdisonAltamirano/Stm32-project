@@ -13,15 +13,6 @@ C_SRCS += \
 ../Middlewares/Third_Party/FreeRTOS/Source/tasks.c \
 ../Middlewares/Third_Party/FreeRTOS/Source/timers.c 
 
-OBJS += \
-./Middlewares/Third_Party/FreeRTOS/Source/croutine.o \
-./Middlewares/Third_Party/FreeRTOS/Source/event_groups.o \
-./Middlewares/Third_Party/FreeRTOS/Source/list.o \
-./Middlewares/Third_Party/FreeRTOS/Source/queue.o \
-./Middlewares/Third_Party/FreeRTOS/Source/stream_buffer.o \
-./Middlewares/Third_Party/FreeRTOS/Source/tasks.o \
-./Middlewares/Third_Party/FreeRTOS/Source/timers.o 
-
 C_DEPS += \
 ./Middlewares/Third_Party/FreeRTOS/Source/croutine.d \
 ./Middlewares/Third_Party/FreeRTOS/Source/event_groups.d \
@@ -31,10 +22,19 @@ C_DEPS += \
 ./Middlewares/Third_Party/FreeRTOS/Source/tasks.d \
 ./Middlewares/Third_Party/FreeRTOS/Source/timers.d 
 
+OBJS += \
+./Middlewares/Third_Party/FreeRTOS/Source/croutine.o \
+./Middlewares/Third_Party/FreeRTOS/Source/event_groups.o \
+./Middlewares/Third_Party/FreeRTOS/Source/list.o \
+./Middlewares/Third_Party/FreeRTOS/Source/queue.o \
+./Middlewares/Third_Party/FreeRTOS/Source/stream_buffer.o \
+./Middlewares/Third_Party/FreeRTOS/Source/tasks.o \
+./Middlewares/Third_Party/FreeRTOS/Source/timers.o 
+
 
 # Each subdirectory must supply rules for building sources it contributes
 Middlewares/Third_Party/FreeRTOS/Source/%.o Middlewares/Third_Party/FreeRTOS/Source/%.su: ../Middlewares/Third_Party/FreeRTOS/Source/%.c Middlewares/Third_Party/FreeRTOS/Source/subdir.mk
-	arm-none-eabi-gcc "$<" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32G431xx -c -I../Core/Inc -I../Drivers/STM32G4xx_HAL_Driver/Inc -I../Drivers/STM32G4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32G4xx/Include -I../Drivers/CMSIS/Include -I"C:/Users/riky_/Vanttec/sdv_embedded/software/SDV_Throttle/libs/vanttec_CANLib/src/Vanttec_CANLib" -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"$(@:%.o=%.d)" -MT"$@" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "$@"
+	arm-none-eabi-gcc "$<" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32G431xx -c -I../Core/Inc -I../Drivers/STM32G4xx_HAL_Driver/Inc -I../Drivers/STM32G4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32G4xx/Include -I../Drivers/CMSIS/Include -I"C:/Users/Z0180064/Vanttec/software/Stm32-project/libs/vanttec_CANLib/src/Vanttec_CANLib" -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F -I"C:/Users/Z0180064/Vanttec/software/Stm32-project/libs/vanttec_CANLib/src/Vanttec_CANLib_Linux" -I"C:/Users/Z0180064/Vanttec/software/Stm32-project/libs" -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"$(@:%.o=%.d)" -MT"$@" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "$@"
 
 clean: clean-Middlewares-2f-Third_Party-2f-FreeRTOS-2f-Source
 

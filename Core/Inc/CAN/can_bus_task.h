@@ -13,6 +13,7 @@
 #include "cmsis_os.h"
 
 static const uint32_t can_tx_task_delay = 5;
+FDCAN_FilterTypeDef filter;
 
 static const uint32_t can_rx_task_delay = 5;
 
@@ -23,9 +24,10 @@ void can_init();
 
 void can_tx_update();
 
-void can_tx_task(void *);
+void can_tx_task();
 
 void can_rx_update();
+void sdv_autonomous_loop1();
 
 void can_rx_task(void *);
 

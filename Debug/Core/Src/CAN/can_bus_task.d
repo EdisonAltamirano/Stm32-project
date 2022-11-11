@@ -26,7 +26,7 @@ Core/Src/CAN/can_bus_task.o: ../Core/Src/CAN/can_bus_task.c \
  ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_flash_ramfunc.h \
  ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_pwr.h \
  ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_pwr_ex.h \
- C:/Users/riky_/Vanttec/sdv_embedded/software/SDV_Throttle/libs/vanttec_CANLib/src/Vanttec_CANLib/CANMessage.h \
+ C:/Users/Z0180064/Vanttec/software/Stm32-project/libs/vanttec_CANLib/src/Vanttec_CANLib/CANMessage.h \
  ../Core/Inc/CAN/can_bus_task.h ../Core/Inc/CAN/can_bus.h \
  ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os.h \
  ../Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h \
@@ -39,7 +39,8 @@ Core/Src/CAN/can_bus_task.o: ../Core/Src/CAN/can_bus_task.c \
  ../Middlewares/Third_Party/FreeRTOS/Source/include/task.h \
  ../Middlewares/Third_Party/FreeRTOS/Source/include/list.h \
  ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.h \
- ../Core/Inc/CAN/can.h ../Core/Inc/CAN/can_bus_parser.h
+ ../Core/Inc/CAN/can.h ../Core/Inc/CAN/can_bus_parser.h \
+ ../Core/Inc/main.h
 ../Core/Inc/CAN/can_bus.h:
 ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal.h:
 ../Core/Inc/stm32g4xx_hal_conf.h:
@@ -67,7 +68,7 @@ Core/Src/CAN/can_bus_task.o: ../Core/Src/CAN/can_bus_task.c \
 ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_flash_ramfunc.h:
 ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_pwr.h:
 ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_pwr_ex.h:
-C:/Users/riky_/Vanttec/sdv_embedded/software/SDV_Throttle/libs/vanttec_CANLib/src/Vanttec_CANLib/CANMessage.h:
+C:/Users/Z0180064/Vanttec/software/Stm32-project/libs/vanttec_CANLib/src/Vanttec_CANLib/CANMessage.h:
 ../Core/Inc/CAN/can_bus_task.h:
 ../Core/Inc/CAN/can_bus.h:
 ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os.h:
@@ -83,3 +84,4 @@ C:/Users/riky_/Vanttec/sdv_embedded/software/SDV_Throttle/libs/vanttec_CANLib/sr
 ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.h:
 ../Core/Inc/CAN/can.h:
 ../Core/Inc/CAN/can_bus_parser.h:
+../Core/Inc/main.h:

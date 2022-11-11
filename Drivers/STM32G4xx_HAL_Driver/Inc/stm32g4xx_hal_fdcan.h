@@ -125,7 +125,7 @@ typedef struct
   */
 typedef struct
 {
-  uint32_t IdType;           /*!(FilterIdHigh)< Specifies the identifier type.
+  uint32_t IdType;           /*!< Specifies the identifier type.
                                   This parameter can be a value of @ref FDCAN_id_type       */
 
   uint32_t FilterIndex;      /*!< Specifies the filter which will be initialized.
@@ -158,19 +158,19 @@ typedef struct
   */
 typedef struct
 {
-  uint32_t Identifier;          /*!(StdId)< Specifies the identifier.
+  uint32_t Identifier;          /*!< Specifies the identifier.
                                      This parameter must be a number between:
                                       - 0 and 0x7FF, if IdType is FDCAN_STANDARD_ID
                                       - 0 and 0x1FFFFFFF, if IdType is FDCAN_EXTENDED_ID               */
 
-  uint32_t IdType;              /*!<(IDE) Specifies the identifier type for the message that will be
+  uint32_t IdType;              /*!< Specifies the identifier type for the message that will be
                                      transmitted.
                                      This parameter can be a value of @ref FDCAN_id_type               */
 
-  uint32_t TxFrameType;         /*!RTR< Specifies the frame type of the message that will be transmitted.
+  uint32_t TxFrameType;         /*!< Specifies the frame type of the message that will be transmitted.
                                      This parameter can be a value of @ref FDCAN_frame_type            */
 
-  uint32_t DataLength;          /*!DLC< Specifies the length of the frame that will be transmitted.
+  uint32_t DataLength;          /*!< Specifies the length of the frame that will be transmitted.
                                       This parameter can be a value of @ref FDCAN_data_length_code     */
 
   uint32_t ErrorStateIndicator; /*!< Specifies the error state indicator.

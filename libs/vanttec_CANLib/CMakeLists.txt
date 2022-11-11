@@ -1,8 +1,20 @@
-cmake_minimum_required(VERSION 3.11)
+cmake_minimum_required(VERSION 3.5)
 project(Vanttec_CANLib)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 14)
 
+file(GLOB_RECURSE Vanttec_CANLib_SRC src/*.cpp)
+
+add_library(Vanttec_CANLibLIB ${Vanttec_CANLib_SRC})
+
+include_directories(src src/Vanttec_CANLib)
+add_executable(Vanttec_CANLib main.cpp)
+target_link_libraries(Vanttec_CANLib pthread Vanttec_CANLibLIB)
+
+
+file(GLOB_RECURSE Vanttec_CANLib_Tests tests/*.cpp)
+
+if(${CMAKE_VERSION} VERSION_GREATER 3.11)
 include(FetchContent)
 FetchContent_Declare(
         googletest
@@ -12,17 +24,10 @@ FetchContent_Declare(
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
-file(GLOB_RECURSE Vanttec_CANLib_SRC src/*.cpp)
-
-include_directories(src src/Vanttec_CANLib)
-add_executable(Vanttec_CANLib main.cpp ${Vanttec_CANLib_SRC})
-target_link_libraries(Vanttec_CANLib pthread)
-
-file(GLOB_RECURSE Vanttec_CANLib_Tests tests/*.cpp)
-
 enable_testing()
-add_executable(Vanttec_CANLib_test ${Vanttec_CANLib_SRC} ${Vanttec_CANLib_Tests})
-target_link_libraries(Vanttec_CANLib_test gtest_main)
+add_executable(Vanttec_CANLib_test ${Vanttec_CANLib_Tests})
+target_link_libraries(Vanttec_CANLib_test gtest_main Vanttec_CANLibLIB)
 
 include(GoogleTest)
 gtest_discover_tests(Vanttec_CANLib_test)
+endif()

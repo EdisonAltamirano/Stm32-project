@@ -9,9 +9,10 @@
 #include "stm32g4xx_hal.h"
 #include <string.h>
 
+
 //extern CAN_HandleTypeDef hcan2;
 
-extern FDCAN_HandleTypeDef hcan2;
+extern FDCAN_HandleTypeDef hfdcan1;
 
 osStatus_t handle_debug_msg_queue(){
 	uint8_t buf[8];
@@ -38,7 +39,7 @@ osStatus_t handle_debug_msg_queue(){
 	buf[0] = DEBUG_LOG_ID;
 
 	// HAL_CAN_AddTxMessage(&hcan, &txHeader, buf, &txMailbox);
-	HAL_FDCAN_AddMessageToTxFifoQ(&hcan2, &txHeader, &txMailbox);
+	HAL_FDCAN_AddMessageToTxFifoQ(&hfdcan1, &txHeader, &txMailbox);
 	return ret;
 }
 

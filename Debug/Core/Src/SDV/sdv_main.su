@@ -1,0 +1,2 @@
+../Core/Src/SDV/sdv_main.c:21:6:main_task_sdv	8	static
+../Core/Src/SDV/sdv_main.c:27:6:sdv_autonomous_loop	4	static

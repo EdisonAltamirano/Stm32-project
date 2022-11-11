@@ -49,7 +49,23 @@ const osThreadAttr_t defaultTask_attributes = {
   .priority = (osPriority_t) osPriorityNormal,
   .stack_size = 128 * 4
 };
+/* Definitions for canTask_tx */
+osThreadId_t canTask_txHandle;
+const osThreadAttr_t canTask_tx_attributes = {
+  .name = "canTask_tx",
+  .priority = (osPriority_t) osPriorityAboveNormal,
+  .stack_size = 128 * 4
+};
+/* Definitions for canTask_rx */
+osThreadId_t canTask_rxHandle;
+const osThreadAttr_t canTask_rx_attributes = {
+  .name = "canTask_rx",
+  .priority = (osPriority_t) osPriorityAboveNormal1,
+  .stack_size = 128 * 4
+};
 /* USER CODE BEGIN PV */
+
+
 
 /* USER CODE END PV */
 
@@ -58,6 +74,8 @@ void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_FDCAN1_Init(void);
 void StartDefaultTask(void *argument);
+void can_tx_task(void *argument);
+void can_rx_task(void *argument);
 
 /* USER CODE BEGIN PFP */
 
@@ -99,6 +117,10 @@ int main(void)
   MX_FDCAN1_Init();
   /* USER CODE BEGIN 2 */
 
+  can_init();
+  /* Init scheduler */
+  osKernelInitialize();
+
   /* USER CODE END 2 */
 
   /* Init scheduler */
@@ -124,6 +146,12 @@ int main(void)
   /* creation of defaultTask */
   defaultTaskHandle = osThreadNew(StartDefaultTask, NULL, &defaultTask_attributes);
 
+  /* creation of canTask_tx */
+  canTask_txHandle = osThreadNew(can_tx_task, NULL, &canTask_tx_attributes);
+
+  /* creation of canTask_rx */
+  //canTask_rxHandle = osThreadNew(can_rx_task, NULL, &canTask_rx_attributes);
+
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
   /* USER CODE END RTOS_THREADS */
@@ -138,6 +166,7 @@ int main(void)
   /* We should never get here as control is now taken by the scheduler */
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+
   while (1)
   {
     /* USER CODE END WHILE */
@@ -206,19 +235,19 @@ static void MX_FDCAN1_Init(void)
   hfdcan1.Init.ClockDivider = FDCAN_CLOCK_DIV1;
   hfdcan1.Init.FrameFormat = FDCAN_FRAME_CLASSIC;
   hfdcan1.Init.Mode = FDCAN_MODE_NORMAL;
-  hfdcan1.Init.AutoRetransmission = DISABLE;
-  hfdcan1.Init.TransmitPause = DISABLE;
+  hfdcan1.Init.AutoRetransmission = ENABLE;
+  hfdcan1.Init.TransmitPause = ENABLE;
   hfdcan1.Init.ProtocolException = DISABLE;
-  hfdcan1.Init.NominalPrescaler = 16;
-  hfdcan1.Init.NominalSyncJumpWidth = 1;
-  hfdcan1.Init.NominalTimeSeg1 = 2;
+  hfdcan1.Init.NominalPrescaler = 8;
+  hfdcan1.Init.NominalSyncJumpWidth = 16;
+  hfdcan1.Init.NominalTimeSeg1 = 13;
   hfdcan1.Init.NominalTimeSeg2 = 2;
   hfdcan1.Init.DataPrescaler = 1;
-  hfdcan1.Init.DataSyncJumpWidth = 1;
-  hfdcan1.Init.DataTimeSeg1 = 1;
-  hfdcan1.Init.DataTimeSeg2 = 1;
-  hfdcan1.Init.StdFiltersNbr = 0;
-  hfdcan1.Init.ExtFiltersNbr = 0;
+  hfdcan1.Init.DataSyncJumpWidth = 4;
+  hfdcan1.Init.DataTimeSeg1 = 5;
+  hfdcan1.Init.DataTimeSeg2 = 4;
+  hfdcan1.Init.StdFiltersNbr = 1;
+  hfdcan1.Init.ExtFiltersNbr = 1;
   hfdcan1.Init.TxFifoQueueMode = FDCAN_TX_FIFO_OPERATION;
   if (HAL_FDCAN_Init(&hfdcan1) != HAL_OK)
   {
@@ -264,6 +293,21 @@ void StartDefaultTask(void *argument)
   }
   /* USER CODE END 5 */
 }
+
+/* USER CODE BEGIN Header_can_tx_task */
+/**
+* @brief Function implementing the canTask_tx thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_can_tx_task */
+
+/* USER CODE BEGIN Header_can_rx_task */
+/**
+* @brief Function implementing the canTask_rx thread.
+* @param argument: Not used
+* @retval None
+*/
 
 /**
   * @brief  This function is executed in case of error occurrence.

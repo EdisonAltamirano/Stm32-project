@@ -26,7 +26,7 @@ Core/Src/CAN/can_bus_parser.o: ../Core/Src/CAN/can_bus_parser.c \
  ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_flash_ramfunc.h \
  ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_pwr.h \
  ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_pwr_ex.h \
- C:/Users/riky_/Vanttec/sdv_embedded/software/SDV_Throttle/libs/vanttec_CANLib/src/Vanttec_CANLib/CANMessage.h
+ C:/Users/Z0180064/Vanttec/software/Stm32-project/libs/vanttec_CANLib/src/Vanttec_CANLib/CANMessage.h
 ../Core/Inc/CAN/can_bus.h:
 ../Core/Inc/CAN/can_bus_parser.h:
 ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal.h:
@@ -55,4 +55,4 @@ Core/Src/CAN/can_bus_parser.o: ../Core/Src/CAN/can_bus_parser.c \
 ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_flash_ramfunc.h:
 ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_pwr.h:
 ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_pwr_ex.h:
-C:/Users/riky_/Vanttec/sdv_embedded/software/SDV_Throttle/libs/vanttec_CANLib/src/Vanttec_CANLib/CANMessage.h:
+C:/Users/Z0180064/Vanttec/software/Stm32-project/libs/vanttec_CANLib/src/Vanttec_CANLib/CANMessage.h:
