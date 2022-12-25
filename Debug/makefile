@@ -84,8 +84,8 @@ all: main-build
 main-build: SDV_Throttle.elf secondary-outputs
 
 # Tool invocations
-SDV_Throttle.elf SDV_Throttle.map: $(OBJS) $(USER_OBJS) C:\Users\Z0180064\Vanttec\software\Stm32-project\STM32G431KBUX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-g++ -o "SDV_Throttle.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\Z0180064\Vanttec\software\Stm32-project\STM32G431KBUX_FLASH.ld" -Wl,-Map="SDV_Throttle.map" -Wl,--gc-sections -static -L"C:\Users\Z0180064\Vanttec\software\Stm32-project\libs\vanttec_CANLib\src\Vanttec_CANLib" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -lstdc++ -lsupc++ -Wl,--end-group
+SDV_Throttle.elf SDV_Throttle.map: $(OBJS) $(USER_OBJS) C:\Users\Z0180064\Vanttec\newEcuador\Stm32-project\STM32G431KBUX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-g++ -o "SDV_Throttle.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\Z0180064\Vanttec\newEcuador\Stm32-project\STM32G431KBUX_FLASH.ld" -Wl,-Map="SDV_Throttle.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -lstdc++ -lsupc++ -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 

@@ -63,6 +63,27 @@ const osThreadAttr_t canTask_rx_attributes = {
   .priority = (osPriority_t) osPriorityAboveNormal1,
   .stack_size = 128 * 4
 };
+/* Definitions for canTask_panel */
+osThreadId_t canTask_panelHandle;
+const osThreadAttr_t canTask_panel_attributes = {
+  .name = "canTask_panel",
+  .priority = (osPriority_t) osPriorityLow,
+  .stack_size = 128 * 4
+};
+/* Definitions for canTask_pot */
+osThreadId_t canTask_potHandle;
+const osThreadAttr_t canTask_pot_attributes = {
+  .name = "canTask_pot",
+  .priority = (osPriority_t) osPriorityLow,
+  .stack_size = 128 * 4
+};
+/* Definitions for canTask_lcd */
+osThreadId_t canTask_lcdHandle;
+const osThreadAttr_t canTask_lcd_attributes = {
+  .name = "canTask_lcd",
+  .priority = (osPriority_t) osPriorityLow,
+  .stack_size = 128 * 4
+};
 /* USER CODE BEGIN PV */
 
 
@@ -76,6 +97,9 @@ static void MX_FDCAN1_Init(void);
 void StartDefaultTask(void *argument);
 void can_tx_task(void *argument);
 void can_rx_task(void *argument);
+void can_task_panel(void *argument);
+void can_task_pot(void *argument);
+void can_task_lcd(void *argument);
 
 /* USER CODE BEGIN PFP */
 
@@ -147,10 +171,19 @@ int main(void)
   defaultTaskHandle = osThreadNew(StartDefaultTask, NULL, &defaultTask_attributes);
 
   /* creation of canTask_tx */
-  canTask_txHandle = osThreadNew(can_tx_task, NULL, &canTask_tx_attributes);
+  //canTask_txHandle = osThreadNew(can_tx_task, NULL, &canTask_tx_attributes);
 
   /* creation of canTask_rx */
   //canTask_rxHandle = osThreadNew(can_rx_task, NULL, &canTask_rx_attributes);
+
+  /* creation of canTask_panel */
+  canTask_panelHandle = osThreadNew(can_task_panel, NULL, &canTask_panel_attributes);
+
+  /* creation of canTask_pot */
+  canTask_potHandle = osThreadNew(can_task_pot, NULL, &canTask_pot_attributes);
+
+  /* creation of canTask_lcd */
+  canTask_lcdHandle = osThreadNew(can_task_lcd, NULL, &canTask_lcd_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -293,21 +326,6 @@ void StartDefaultTask(void *argument)
   }
   /* USER CODE END 5 */
 }
-
-/* USER CODE BEGIN Header_can_tx_task */
-/**
-* @brief Function implementing the canTask_tx thread.
-* @param argument: Not used
-* @retval None
-*/
-/* USER CODE END Header_can_tx_task */
-
-/* USER CODE BEGIN Header_can_rx_task */
-/**
-* @brief Function implementing the canTask_rx thread.
-* @param argument: Not used
-* @retval None
-*/
 
 /**
   * @brief  This function is executed in case of error occurrence.

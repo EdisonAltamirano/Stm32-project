@@ -10,7 +10,14 @@
 #include "CAN/can.h"
 #include <stdio.h>
 
+
 volatile uint8_t g_sendPing;
+volatile uint8_t g_panelModule;
+volatile float data_panel;
+volatile uint8_t g_sendInfopanel;
+volatile uint8_t g_panelError;
+
+
 
 static const osThreadAttr_t hbTask_attributes = {
   .name = "hbTxCan",

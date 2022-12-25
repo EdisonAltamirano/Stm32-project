@@ -12,6 +12,9 @@
 #define HEARTBEAT_DELAY 500
 #define DEBUG_MSG_DELAY 10
 #define SBUS_DELAY 1000
+#define SUCCESS_CAN_MSG 0x2
+#define FAILURE_CAN_MSG 0x1
+
 
 void start_can_tx_tasks();
 

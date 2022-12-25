@@ -1,5 +1,5 @@
-../Core/Src/CAN/can_bus_tx_tasks.c:46:13:can_hb_tx_task	16	static
-../Core/Src/CAN/can_bus_tx_tasks.c:56:13:can_debug_msg_tx_task	16	static
-../Core/Src/CAN/can_bus_tx_tasks.c:63:13:can_send_ping_task	16	static
-../Core/Src/CAN/can_bus_tx_tasks.c:76:13:debug_vars_task	24	static
-../Core/Src/CAN/can_bus_tx_tasks.c:90:6:start_can_tx_tasks	8	static
+../Core/Src/CAN/can_bus_tx_tasks.c:53:13:can_hb_tx_task	16	static
+../Core/Src/CAN/can_bus_tx_tasks.c:63:13:can_debug_msg_tx_task	16	static
+../Core/Src/CAN/can_bus_tx_tasks.c:70:13:can_send_ping_task	16	static
+../Core/Src/CAN/can_bus_tx_tasks.c:83:13:debug_vars_task	24	static
+../Core/Src/CAN/can_bus_tx_tasks.c:97:6:start_can_tx_tasks	8	static

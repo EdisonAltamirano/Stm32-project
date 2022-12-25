@@ -1,7 +1,8 @@
-../Core/Src/CAN/can_bus_task.c:30:6:can_init	24	static
-../Core/Src/CAN/can_bus_task.c:81:6:can_tx_update	64	static
-../Core/Src/CAN/can_bus_task.c:120:17:BufferCmp8b	24	static
-../Core/Src/CAN/can_bus_task.c:136:6:can_tx_task	8	static
-../Core/Src/CAN/can_bus_task.c:185:6:sdv_autonomous_loop1	4	static
-../Core/Src/CAN/can_bus_task.c:189:6:can_rx_update	24	static
-../Core/Src/CAN/can_bus_task.c:292:6:can_rx_task	16	static
+../Core/Src/CAN/can_bus_task.c:32:6:can_init	32	static
+../Core/Src/CAN/can_bus_task.c:56:6:panel_init	12	static
+../Core/Src/CAN/can_bus_task.c:90:6:can_tx_task	8	static
+../Core/Src/CAN/can_bus_task.c:120:6:can_rx_task	64	static
+../Core/Src/CAN/can_bus_task.c:137:6:sdv_autonomous_loop1	4	static
+../Core/Src/CAN/can_bus_task.c:141:6:can_task_panel	8	static
+../Core/Src/CAN/can_bus_task.c:175:6:can_task_pot	8	static
+../Core/Src/CAN/can_bus_task.c:181:6:can_task_lcd	8	static
