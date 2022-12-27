@@ -42,6 +42,8 @@
 /* Private variables ---------------------------------------------------------*/
 FDCAN_HandleTypeDef hfdcan1;
 
+I2C_HandleTypeDef hi2c3;
+
 /* Definitions for defaultTask */
 osThreadId_t defaultTaskHandle;
 const osThreadAttr_t defaultTask_attributes = {
@@ -94,6 +96,7 @@ const osThreadAttr_t canTask_lcd_attributes = {
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_FDCAN1_Init(void);
+static void MX_I2C3_Init(void);
 void StartDefaultTask(void *argument);
 void can_tx_task(void *argument);
 void can_rx_task(void *argument);
@@ -139,9 +142,12 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_FDCAN1_Init();
+  MX_I2C3_Init();
   /* USER CODE BEGIN 2 */
 
   can_init();
+  pot_init();
+  //lcd_init();
   /* Init scheduler */
   osKernelInitialize();
 
@@ -177,13 +183,13 @@ int main(void)
   //canTask_rxHandle = osThreadNew(can_rx_task, NULL, &canTask_rx_attributes);
 
   /* creation of canTask_panel */
-  canTask_panelHandle = osThreadNew(can_task_panel, NULL, &canTask_panel_attributes);
+  //canTask_panelHandle = osThreadNew(can_task_panel, NULL, &canTask_panel_attributes);
 
   /* creation of canTask_pot */
   canTask_potHandle = osThreadNew(can_task_pot, NULL, &canTask_pot_attributes);
 
   /* creation of canTask_lcd */
-  canTask_lcdHandle = osThreadNew(can_task_lcd, NULL, &canTask_lcd_attributes);
+  //canTask_lcdHandle = osThreadNew(can_task_lcd, NULL, &canTask_lcd_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -293,6 +299,54 @@ static void MX_FDCAN1_Init(void)
 }
 
 /**
+  * @brief I2C3 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_I2C3_Init(void)
+{
+
+  /* USER CODE BEGIN I2C3_Init 0 */
+
+  /* USER CODE END I2C3_Init 0 */
+
+  /* USER CODE BEGIN I2C3_Init 1 */
+
+  /* USER CODE END I2C3_Init 1 */
+  hi2c3.Instance = I2C3;
+  hi2c3.Init.Timing = 0x00303D5B;
+  hi2c3.Init.OwnAddress1 = 0;
+  hi2c3.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
+  hi2c3.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
+  hi2c3.Init.OwnAddress2 = 0;
+  hi2c3.Init.OwnAddress2Masks = I2C_OA2_NOMASK;
+  hi2c3.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
+  hi2c3.Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;
+  if (HAL_I2C_Init(&hi2c3) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+  /** Configure Analogue filter
+  */
+  if (HAL_I2CEx_ConfigAnalogFilter(&hi2c3, I2C_ANALOGFILTER_ENABLE) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+  /** Configure Digital filter
+  */
+  if (HAL_I2CEx_ConfigDigitalFilter(&hi2c3, 0) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN I2C3_Init 2 */
+
+  /* USER CODE END I2C3_Init 2 */
+
+}
+
+/**
   * @brief GPIO Initialization Function
   * @param None
   * @retval None
@@ -302,6 +356,7 @@ static void MX_GPIO_Init(void)
 
   /* GPIO Ports Clock Enable */
   __HAL_RCC_GPIOA_CLK_ENABLE();
+  __HAL_RCC_GPIOB_CLK_ENABLE();
 
 }
 

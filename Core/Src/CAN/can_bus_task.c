@@ -18,6 +18,8 @@
 #include <stdbool.h>
 //extern CAN_HandleTypeDef hcan2;
 extern FDCAN_HandleTypeDef hfdcan1;
+extern I2C_HandleTypeDef hi2c3;
+//extern I2C_HandleTypeDef hi2c2;
 FDCAN_TxHeaderTypeDef TxHeader;
 uint8_t CarTxData[] = {0x00};
 osMessageQueueId_t debugMessageQueue;
@@ -28,7 +30,14 @@ int cmp = 0;
 extern volatile uint8_t g_panelModule;
 extern volatile uint8_t g_sendInfopanel;
 extern volatile uint8_t g_panelError;
+
 extern volatile float data_panel;
+#define SLAVE_ADDRESS_LCD 0x27<<1 // change this according to ur setup
+static const uint8_t DS3502_ADDR = 0x27<<1 ;
+static const uint8_t DS3502_MODE_WR = 0x80;
+static const uint8_t DS3502_MODE_WR_IVR = 0x00;
+static const uint8_t DS3502_REG_WR_IVR = 0x00;
+static const uint8_t DS3502_REG_CR = 0x02;
 void can_init(){
 
 	FDCAN_FilterTypeDef sFilterConfig;
@@ -52,6 +61,57 @@ void can_init(){
 	    /* Notification Error */
 	    Error_Handler();
 	  }
+}
+void lcd_send_string(char *str){
+	while (*str) lcd_send_data (*str++);
+}
+void lcd_send_data (char data)
+{
+	char data_u, data_l;
+	uint8_t data_t[4];
+	data_u = (data&0xf0);
+	data_l = ((data<<4)&0xf0);
+	data_t[0] = data_u|0x0D;  //en=1, rs=0
+	data_t[1] = data_u|0x09;  //en=0, rs=0
+	data_t[2] = data_l|0x0D;  //en=1, rs=0
+	data_t[3] = data_l|0x09;  //en=0, rs=0
+	HAL_I2C_Master_Transmit (&hi2c3, SLAVE_ADDRESS_LCD,(uint8_t *) data_t, 4, 100);
+}
+void lcd_send_cmd(char cmd){
+  char data_u, data_l;
+	uint8_t data_t[4];
+	data_u = (cmd&0xf0);
+	data_l = ((cmd<<4)&0xf0);
+	data_t[0] = data_u|0x0C;  //en=1, rs=0
+	data_t[1] = data_u|0x08;  //en=0, rs=0
+	data_t[2] = data_l|0x0C;  //en=1, rs=0
+	data_t[3] = data_l|0x08;  //en=0, rs=0
+	HAL_I2C_Master_Transmit(&hi2c3, SLAVE_ADDRESS_LCD,(uint8_t *) data_t, 4, 100);
+}
+
+void lcd_init(){
+	// 4 bit initialisation
+	HAL_Delay(50);  // wait for >40ms
+	lcd_send_cmd (0x30);
+	HAL_Delay(5);  // wait for >4.1ms
+	lcd_send_cmd (0x30);
+	HAL_Delay(1);  // wait for >100us
+	lcd_send_cmd (0x30);
+	HAL_Delay(10);
+	lcd_send_cmd (0x20);  // 4bit mode
+	HAL_Delay(10);
+
+  // dislay initialisation
+	lcd_send_cmd (0x28); // Function set --> DL=0 (4 bit mode), N = 1 (2 line display) F = 0 (5x8 characters)
+	HAL_Delay(1);
+	lcd_send_cmd (0x08); //Display on/off control --> D=0,C=0, B=0  ---> display off
+	HAL_Delay(1);
+	lcd_send_cmd (0x01);  // clear display
+	HAL_Delay(1);
+	HAL_Delay(1);
+	lcd_send_cmd (0x06); //Entry mode set --> I/D = 1 (increment cursor) & S = 0 (no shift)
+	HAL_Delay(1);
+	lcd_send_cmd (0x0C); //Display on/off control --> D = 1, C and B = 0. (Cursor and blink, last two bits)
 }
 void panel_init(){
 
@@ -87,6 +147,60 @@ void panel_init(){
 	panel_leds[5]  =led6;
 }
 
+bool pot_init(){
+    //@return True if initialization was successful, otherwise false.
+    // Tell DS3502 that we want to read from the pot register
+	 buf_pot[0] = DS3502_REG_CR;
+	 HAL_StatusTypeDef  ret = HAL_I2C_Master_Transmit(&hi2c3, DS3502_ADDR, buf_pot, 1, HAL_MAX_DELAY);
+	 if (ret != HAL_OK){
+		 return false;
+	 }
+	 else{
+		 //Write the MODE bit which determines how I2C data is written to the WR and IVR data register
+		 buf_pot[0] = DS3502_MODE_WR;
+		 ret =  HAL_I2C_Master_Transmit(&hi2c3, DS3502_ADDR, buf_pot, 1, HAL_MAX_DELAY);
+		 if (ret != HAL_OK){
+		 		 return false;
+		 	 }
+		 else{
+			 return true;
+		 }
+	 }
+}
+
+bool getWiper(uint8_t reg,uint8_t *data){
+	 buf_pot[0] = reg;
+	 HAL_StatusTypeDef  ret = HAL_I2C_Master_Transmit(&hi2c3, DS3502_ADDR, buf_pot, 1, HAL_MAX_DELAY);
+	 if (ret != HAL_OK){
+		 return false;
+	 }
+	 else{
+		 HAL_I2C_Master_Receive(&hi2c3, DS3502_ADDR, data, 1, HAL_MAX_DELAY);
+		 if (ret != HAL_OK){
+		 		 return false;
+		 	 }
+		 else{
+			 return true;
+		 }
+	 }
+}
+bool setWiper(uint8_t reg,uint8_t data){
+	 buf_pot[0] = reg;
+	 HAL_StatusTypeDef  ret = HAL_I2C_Master_Transmit(&hi2c3, DS3502_ADDR, buf_pot, 1, HAL_MAX_DELAY);
+	 if (ret != HAL_OK){
+		 return false;
+	 }
+	 else{
+		 buf_pot[0] = data;
+		 ret =  HAL_I2C_Master_Transmit(&hi2c3, DS3502_ADDR, buf_pot, 1, HAL_MAX_DELAY);
+		 if (ret != HAL_OK){
+		 		 return false;
+		 	 }
+		 else{
+			 return true;
+		 }
+	 }
+}
 void can_tx_task(void){
 	if(g_sendInfopanel){
 		  TxHeader.Identifier = 0x222;
@@ -174,12 +288,21 @@ void can_task_panel(void)
 }
 void can_task_pot(){
 	for(;;){
+		uint8_t new_wiper_value = 0x3C;
+		bool read = true;
+		if((new_wiper_value > 0) || (new_wiper_value < 0x7F) ) {
+			setWiper(DS3502_REG_WR_IVR,new_wiper_value );
+		}
+		if(read){
+			getWiper(DS3502_REG_WR_IVR,pos);
+		}
 		osDelay(500);
 	}
 }
 
 void can_task_lcd(){
 	for(;;){
+		lcd_send_string("HELLO WORLD");
 		osDelay(500);
 	}
 }

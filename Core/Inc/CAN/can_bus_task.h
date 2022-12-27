@@ -12,6 +12,7 @@
 #include <stdint.h>
 #include "cmsis_os.h"
 #include <stdio.h>
+#include <stdbool.h>
 
 static const uint32_t can_tx_task_delay = 5;
 FDCAN_FilterTypeDef filter;
@@ -31,6 +32,14 @@ uint8_t pos[8];
 uint8_t buf1[8];
 
 void panel_init();
+void lcd_init();
+void lcd_send_cmd(char cmd);
+void lcd_send_string(char *str);
+void lcd_send_data (char data);
+bool getWiper(uint8_t reg,uint8_t *data);
+bool setWiper(uint8_t reg,uint8_t data);
+bool pot_init();
+
 /**
  * Updates the tx_data struct which is sent over CAN
  */
