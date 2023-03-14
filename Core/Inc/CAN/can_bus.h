@@ -23,6 +23,14 @@
 #define JETSON_HEARTBEAT_ID 0x1E
 #define PING_ID 0x1F
 #define BATTERY_VOLTAGE_ID 0x20
+//Jetson Xavier PANEL
+#define XAVIER_RECEIVE 0x333
+#define XAVIER_SEND 0X222
+//Jetson Xavier THROTTLE
+#define THROTTLE_POS 0x334
+#define THROTTLE_MAX 0x335
+#define THROTTLE_SEND 0X223
+
 
 #ifdef __cplusplus
 extern "C" {

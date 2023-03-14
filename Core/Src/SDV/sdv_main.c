@@ -2,7 +2,7 @@
  * sdv_main.c
  *
  *  Created on: Oct 26, 2022
- *      Author: Z0180064
+ *      Author= Z0180064
  */
 
 #include "SDV/sdv.h"

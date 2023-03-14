@@ -2,7 +2,7 @@
  * can_bus_task.c
  *
  *  Created on: Jan 9, 2022
- *      Author: abiel
+ *      Author: Edison
  */
 
 #include <string.h>
@@ -25,15 +25,23 @@ uint8_t CarTxData[] = {0x00};
 osMessageQueueId_t debugMessageQueue;
 osMessageQueueId_t txMessageQueue;
 uint32_t ab=0;
-uint8_t buf_pot[12];
 int cmp = 0;
 extern volatile uint8_t g_panelModule;
+extern volatile uint8_t g_throttleModule;
 extern volatile uint8_t g_sendInfopanel;
+extern volatile uint8_t g_sendInfothrottle;
 extern volatile uint8_t g_panelError;
+extern volatile uint8_t g_throttleError;
+extern volatile uint8_t pot_position;
+extern volatile uint8_t max_velocity;
+extern volatile uint8_t g_stateThrottle;
+extern volatile bool enable_potentiometer;
+
 
 extern volatile float data_panel;
 #define SLAVE_ADDRESS_LCD 0x27<<1 // change this according to ur setup
-static const uint8_t DS3502_ADDR = 0x27<<1 ;
+uint8_t buf_pot[12];
+static const uint8_t DS3502_ADDR = 0x28<<1 ;
 static const uint8_t DS3502_MODE_WR = 0x80;
 static const uint8_t DS3502_MODE_WR_IVR = 0x00;
 static const uint8_t DS3502_REG_WR_IVR = 0x00;
@@ -149,102 +157,134 @@ void panel_init(){
 
 bool pot_init(){
     //@return True if initialization was successful, otherwise false.
-    // Tell DS3502 that we want to read from the pot register
-	 buf_pot[0] = DS3502_REG_CR;
-	 HAL_StatusTypeDef  ret = HAL_I2C_Master_Transmit(&hi2c3, DS3502_ADDR, buf_pot, 1, HAL_MAX_DELAY);
-	 if (ret != HAL_OK){
-		 return false;
+	uint8_t devices = 0u;
+
+	printf("Searching for I2C devices on the bus...\n");
+	HAL_StatusTypeDef  status ;
+	/* Values outside 0x03 and 0x77 are invalid. */
+	for (uint8_t i = 0x03u; i < 0x77u; i++)
+	{
+		uint8_t address = i << 1u ;
+		status = HAL_I2C_IsDeviceReady(&hi2c3, address, 3u, 10u);
+		/* In case there is a positive feedback, print it out. */
+		if (HAL_OK == status)
+		{
+		  printf("Device found: 0x%02X\n", address);
+		  devices++;
+		}
 	 }
-	 else{
-		 //Write the MODE bit which determines how I2C data is written to the WR and IVR data register
-		 buf_pot[0] = DS3502_MODE_WR;
-		 ret =  HAL_I2C_Master_Transmit(&hi2c3, DS3502_ADDR, buf_pot, 1, HAL_MAX_DELAY);
-		 if (ret != HAL_OK){
-		 		 return false;
-		 	 }
-		 else{
-			 return true;
-		 }
-	 }
+	  /* Feedback of the total number of devices. */
+	  if (0u == devices)
+	  {
+		printf("No device found.\n");
+	  }
+	  else
+	  {
+		printf("Total found devices: %d\n", devices);
+		   // Tell DS3502 that we want to read from the pot register
+			 buf_pot[0] = DS3502_REG_CR;
+		   //Write the MODE bit which determines how I2C data is written to the WR and IVR data register
+			 buf_pot[1] = DS3502_MODE_WR;
+			 HAL_StatusTypeDef  ret = HAL_I2C_Master_Transmit(&hi2c3, DS3502_ADDR, buf_pot, 2, HAL_MAX_DELAY);
+			 if (ret != HAL_OK){
+				 return false;
+			 }
+			 else{
+				 return true;
+			 }
+	  }
+
 }
 
 bool getWiper(uint8_t reg,uint8_t *data){
 	 buf_pot[0] = reg;
-	 HAL_StatusTypeDef  ret = HAL_I2C_Master_Transmit(&hi2c3, DS3502_ADDR, buf_pot, 1, HAL_MAX_DELAY);
+	 buf_pot[1] = data;
+	 HAL_StatusTypeDef  ret = HAL_I2C_Master_Transmit(&hi2c3, DS3502_ADDR, buf_pot, 2, HAL_MAX_DELAY);
 	 if (ret != HAL_OK){
 		 return false;
 	 }
 	 else{
-		 HAL_I2C_Master_Receive(&hi2c3, DS3502_ADDR, data, 1, HAL_MAX_DELAY);
-		 if (ret != HAL_OK){
-		 		 return false;
-		 	 }
-		 else{
-			 return true;
-		 }
+		 return true;
+
 	 }
 }
 bool setWiper(uint8_t reg,uint8_t data){
 	 buf_pot[0] = reg;
-	 HAL_StatusTypeDef  ret = HAL_I2C_Master_Transmit(&hi2c3, DS3502_ADDR, buf_pot, 1, HAL_MAX_DELAY);
+	 buf_pot[1] = data;
+	 HAL_StatusTypeDef  ret = HAL_I2C_Master_Transmit(&hi2c3, DS3502_ADDR, buf_pot, 2, HAL_MAX_DELAY);
 	 if (ret != HAL_OK){
 		 return false;
 	 }
 	 else{
-		 buf_pot[0] = data;
-		 ret =  HAL_I2C_Master_Transmit(&hi2c3, DS3502_ADDR, buf_pot, 1, HAL_MAX_DELAY);
-		 if (ret != HAL_OK){
-		 		 return false;
-		 	 }
-		 else{
-			 return true;
-		 }
+		 return true;
+
 	 }
 }
 void can_tx_task(void){
-	if(g_sendInfopanel){
-		  TxHeader.Identifier = 0x222;
-		  TxHeader.IdType = FDCAN_STANDARD_ID;
-		  TxHeader.TxFrameType = FDCAN_DATA_FRAME;
-		  TxHeader.DataLength = FDCAN_DLC_BYTES_1;
-		  TxHeader.ErrorStateIndicator = FDCAN_ESI_ACTIVE;
-		  TxHeader.BitRateSwitch = FDCAN_BRS_ON;
-		  TxHeader.FDFormat = FDCAN_FD_CAN;
-		  TxHeader.TxEventFifoControl = FDCAN_STORE_TX_EVENTS;
-		  TxHeader.MessageMarker = 0;
-		  if(g_panelError){
-			  CarTxData[0] = FAILURE_CAN_MSG;
-			  g_panelError = 1;
-		  }
-		  else{
-			  CarTxData[0] = SUCCESS_CAN_MSG;
-		  }
+	for(;;){
+	//	if(g_sendInfopanel){
+	//			  TxHeader.Identifier = 0x222;
+	//			  TxHeader.IdType = FDCAN_STANDARD_ID;
+	//			  TxHeader.TxFrameType = FDCAN_DATA_FRAME;
+	//			  TxHeader.DataLength = FDCAN_DLC_BYTES_1;
+	//			  TxHeader.ErrorStateIndicator = FDCAN_ESI_ACTIVE;
+	//			  TxHeader.BitRateSwitch = FDCAN_BRS_ON;
+	//			  TxHeader.FDFormat = FDCAN_FD_CAN;
+	//			  TxHeader.TxEventFifoControl = FDCAN_STORE_TX_EVENTS;
+	//			  TxHeader.MessageMarker = 0;
+	//			  if(g_panelError){
+	//				  CarTxData[0] = FAILURE_CAN_MSG;
+	//				  g_panelError = 0;
+	//			  }
+	//			  else{
+	//				  CarTxData[0] = SUCCESS_CAN_MSG;
+	//			  }
+	//
+	//			  if (HAL_FDCAN_AddMessageToTxFifoQ(&hfdcan1, &TxHeader, CarTxData)!= HAL_OK)
+	//			  {
+	//			   Error_Handler();
+	//			  }
+	//			osDelay(can_tx_task_delay);
+	//			g_sendInfopanel = 0;
+	//		}
+		if(g_sendInfothrottle){
+			  TxHeader.Identifier = 0x223;
+			  TxHeader.IdType = FDCAN_STANDARD_ID;
+			  TxHeader.TxFrameType = FDCAN_DATA_FRAME;
+			  TxHeader.DataLength = FDCAN_DLC_BYTES_1;
+			  TxHeader.ErrorStateIndicator = FDCAN_ESI_ACTIVE;
+			  TxHeader.BitRateSwitch = FDCAN_BRS_ON;
+			  TxHeader.FDFormat = FDCAN_FD_CAN;
+			  TxHeader.TxEventFifoControl = FDCAN_STORE_TX_EVENTS;
+			  TxHeader.MessageMarker = 0;
+			  if(g_throttleError){
+				  CarTxData[0] = FAILURE_CAN_MSG;
+				  g_throttleError = 0;
+			  }
+			  else{
+				  CarTxData[0] = SUCCESS_CAN_MSG;
+			  }
 
-		  if (HAL_FDCAN_AddMessageToTxFifoQ(&hfdcan1, &TxHeader, CarTxData)!= HAL_OK)
-		  {
-		   Error_Handler();
-		  }
-		osDelay(can_tx_task_delay);
-		g_sendInfopanel = 0;
-	}
+			  if (HAL_FDCAN_AddMessageToTxFifoQ(&hfdcan1, &TxHeader, CarTxData)!= HAL_OK)
+			  {
+			   Error_Handler();
+			  }
+			g_sendInfothrottle = 0;
+		}
 	osDelay(500);
-
+	}
 }
 
 void can_rx_task(void *params){
 	for(;;){
-		//TODO check both FIFO?
-		//CAN_RxHeaderTypeDef rxHeader;
+
 		FDCAN_RxHeaderTypeDef rxHeader;
-		//while(HAL_CAN_GetRxFifoFillLevel(&hcan2, CAN_RX_FIFO0) != 0){
 		while(HAL_FDCAN_GetRxFifoFillLevel(&hfdcan1, FDCAN_RX_FIFO0) != 0){
-			//HAL_StatusTypeDef ret = HAL_CAN_GetRxMessage(&hcan2, CAN_RX_FIFO0, &rxHeader, buf);
 			HAL_StatusTypeDef ret = HAL_FDCAN_GetRxMessage(&hfdcan1, FDCAN_RX_FIFO0, &rxHeader, buf);
 			if(ret != HAL_OK) continue;
 			//Parse can message
 			can_parse_msg(&rxHeader, buf);
 		}
-		ab++;
 		osDelay(can_rx_task_delay);
 	}
 }
@@ -288,15 +328,68 @@ void can_task_panel(void)
 }
 void can_task_pot(){
 	for(;;){
-		uint8_t new_wiper_value = 0x3C;
-		bool read = true;
-		if((new_wiper_value > 0) || (new_wiper_value < 0x7F) ) {
-			setWiper(DS3502_REG_WR_IVR,new_wiper_value );
+		if(enable_potentiometer){
+			setWiper(DS3502_REG_WR_IVR,5);
+			osDelay(1000);
+			setWiper(DS3502_REG_WR_IVR,20);
+			osDelay(1000);
+			setWiper(DS3502_REG_WR_IVR,30);
+			osDelay(1000);
+			setWiper(DS3502_REG_WR_IVR,120);
+			osDelay(1000);
 		}
-		if(read){
-			getWiper(DS3502_REG_WR_IVR,pos);
+		else{
+		    //@return True if initialization was successful, otherwise false.
+			uint8_t devices = 0u;
+
+			printf("Searching for I2C devices on the bus...\n");
+			HAL_StatusTypeDef  status ;
+			/* Values outside 0x03 and 0x77 are invalid. */
+			for (uint8_t i = 0x03u; i < 0x77u; i++)
+			{
+				uint8_t address = i << 1u ;
+				status = HAL_I2C_IsDeviceReady(&hi2c3, address, 3u, 10u);
+				/* In case there is a positive feedback, print it out. */
+				if (HAL_OK == status)
+				{
+				  printf("Device found: 0x%02X\n", address);
+				  devices++;
+				}
+			 }
+			  /* Feedback of the total number of devices. */
+			  if (0u == devices)
+			  {
+				printf("No device found.\n");
+			  }
+			  else
+			  {
+				printf("Total found devices: %d\n", devices);
+				   // Tell DS3502 that we want to read from the pot register
+					 buf_pot[0] = DS3502_REG_CR;
+				   //Write the MODE bit which determines how I2C data is written to the WR and IVR data register
+					 buf_pot[1] = DS3502_MODE_WR;
+					 HAL_StatusTypeDef  ret = HAL_I2C_Master_Transmit(&hi2c3, DS3502_ADDR, buf_pot, 2, HAL_MAX_DELAY);
+					 if (ret == HAL_OK){
+						 enable_potentiometer = true;
+					 }
+			  }
+
 		}
-		osDelay(500);
+
+//		if(g_throttleModule){
+//			bool read = false;
+//			if(g_stateThrottle == 1){
+//				if((pot_position > 0) || (pot_position < max_velocity) ) {
+//					setWiper(DS3502_REG_WR_IVR,pot_position );
+//				}
+//			}
+//			if(read){
+//				getWiper(DS3502_REG_WR_IVR,pos);
+//			}
+//			g_sendInfothrottle = 1;
+//			g_throttleModule = 0;
+//		}
+       osDelay(500);
 	}
 }
 

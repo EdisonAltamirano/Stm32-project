@@ -9,13 +9,22 @@
 #include "cmsis_os.h"
 #include "CAN/can.h"
 #include <stdio.h>
-
+#include <stdbool.h>
 
 volatile uint8_t g_sendPing;
 volatile uint8_t g_panelModule;
+volatile uint8_t g_throttleModule;
 volatile float data_panel;
 volatile uint8_t g_sendInfopanel;
-volatile uint8_t g_panelError;
+volatile uint8_t g_sendInfothrottle;
+volatile bool enable_potentiometer;
+volatile uint8_t g_panelError=0;
+volatile uint8_t g_throttleError=0;
+volatile uint8_t g_stateThrottle;
+volatile uint8_t max_velocity=0x3F; //Safety velocity
+volatile uint8_t g_stateThrottle;
+volatile uint8_t pot_position;
+volatile uint8_t max_velocity;
 
 
 
